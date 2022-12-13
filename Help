@@ -1,0 +1,100 @@
+#include "helpers.h"
+#include <math.h>
+#include <stdio.h>
+
+// Convert image to grayscale
+void grayscale(int height, int width, RGBTRIPLE image[height][width])
+{
+    for (int i = 0; i < height; i ++)
+    {
+        for (int j = 0; j < width; j ++)
+        {
+            float average = ((double)image[i][j].rgbtBlue + (double)image[i][j].rgbtRed + (double)image[i][j].rgbtGreen) / 3.0;
+            average = roundf(average);
+            image[i][j].rgbtBlue = average;
+            image[i][j].rgbtRed = average;
+            image[i][j].rgbtGreen = average;
+        }
+    }
+}
+
+// Reflect image horizontally
+void reflect(int height, int width, RGBTRIPLE image[height][width])
+{
+    // Makes a copy to transfer the reflected image into
+    RGBTRIPLE temp[height][width];
+    for (int i = 0; i < height; i ++)
+    {
+        for (int j = 0; j < width; j ++)
+        {
+
+            // Transfers the reflected image to the temp file
+            temp[i][j] = image[i][width - j - 1];
+        }
+
+        for (int k = 0; k < width; k ++)
+        {
+            image[i][k] = temp[i][k];
+        }
+    }
+}
+
+// Blur image
+void blur(int height, int width, RGBTRIPLE image[height][width])
+{
+    RGBTRIPLE temp[height][width];
+    // Step 1: Populate temp variable with the blurred RGB values
+    for (int i = 0; i < height; i ++)
+    {
+        for (int j = 0; j < width; j ++)
+        {
+            // Initialise variables
+            float sumBlue = 0;
+            float sumGreen = 0;
+            float sumRed = 0;
+            float counter = 0;
+
+            for (int k = -1; k < 2; k ++)
+            {
+                // skips cases where the pixel is on the northern or southern edges
+                if (i + k < 0 || i + k >= height)
+                {
+                    continue;
+                }
+
+                for (int l = -1; l < 2; l ++)
+                {
+                    // skips cases where the pixel is on the western or eastern edges
+                    if (j + l < 0 || j + l >= width)
+                    {
+                        continue;
+                    }
+
+                    sumRed += (double)image[i + k][j + l].rgbtRed;
+                    sumGreen += (double)image[i + k][j + l].rgbtGreen;
+                    sumBlue += (double)image[i + k][j + l].rgbtBlue;
+                    counter ++;
+                }
+            }
+            printf("%f\n", sumRed);
+            printf("%f\n", sumGreen);
+            printf("%f\n", sumBlue);
+            printf("%f\n", counter);
+
+            temp[i][j].rgbtRed = roundf(sumRed / counter);
+            temp[i][j].rgbtGreen = roundf(sumGreen / counter);
+            temp[i][j].rgbtBlue = roundf(sumBlue / counter);
+        }
+
+        for (int m = 0; m < width; m ++)
+        {
+            image[i][m] = temp[i][m];
+        }
+    }
+}
+
+// Detect edges
+void edges(int height, int width, RGBTRIPLE image[height][width])
+{
+    return;
+}
